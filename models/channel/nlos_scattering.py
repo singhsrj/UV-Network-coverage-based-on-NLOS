@@ -123,9 +123,15 @@ class NLOSScatteringModel:
         """
         Calculate scattering efficiency for given angles and mode
         
-        Simple explanation:
-        - How well the UV light bounces off air particles
-        - Better angles = more efficient scattering = longer distance
+        Physical basis:
+        - Scattering efficiency depends on geometry and directionality
+        - Forward scattering is more efficient than omnidirectional
+        - Lower elevation angles concentrate energy better
+        
+        The efficiency is calculated based on:
+        1. Directivity factor (how focused the beam is)
+        2. Angle optimization (lower angles = better forward scattering)
+        3. Geometric losses
         
         Args:
             theta1: Transmission elevation angle (degrees)
@@ -138,25 +144,63 @@ class NLOSScatteringModel:
         theta1_rad = np.radians(theta1)
         theta2_rad = np.radians(theta2)
         
+        # Calculate directivity factor based on mode
         if mode == NLOSMode.NLOS_A:
-            # Vertical mode: moderate efficiency
-            efficiency = 0.5
-        
+            # Vertical (90°): omnidirectional scattering
+            # Energy spreads equally in all directions (4π steradians)
+            # Very low directivity
+            directivity = 0.25  # 1/(4π) normalized
+            
         elif mode == NLOSMode.NLOS_B:
-            # Forward scattering preferred
-            efficiency = 0.6 * np.sin(theta1_rad)
-        
+            # Semi-directional: one angle optimized
+            # Directivity improves with non-vertical transmission
+            # Better forward scattering with lower theta1
+            directivity = 0.5 * (1.0 - np.sin(theta1_rad))
+            
         elif mode == NLOSMode.NLOS_C:
-            # Best efficiency with proper alignment
-            # Lower angles give better scattering
-            angle_factor = (np.sin(theta1_rad) + np.sin(theta2_rad)) / 2
-            efficiency = 0.7 * angle_factor
-        
+            # Highly directional: both angles optimized
+            # Maximum forward scattering efficiency
+            # Both angles contribute to directivity
+            directivity = 0.7 * (2.0 - np.sin(theta1_rad) - np.sin(theta2_rad)) / 2.0
+            
         else:
-            efficiency = 0.5
+            directivity = 0.5
         
-        # Ensure efficiency is between 0 and 1
-        return np.clip(efficiency, 0.1, 1.0)
+        # Calculate angle quality factor
+        # Lower angles give better scattering geometry
+        # This represents the scattering cross-section optimization
+        avg_angle_rad = (theta1_rad + theta2_rad) / 2.0
+        
+        # Scattering is optimal at lower angles (better path through scattering volume)
+        # Use cosine to favor lower angles: cos(0°)=1, cos(90°)=0
+        angle_quality = np.cos(avg_angle_rad)
+        
+        # Geometric efficiency: how well transmitter and receiver are aligned
+        # Uses the difference in angles - smaller difference = better alignment
+        angle_difference = abs(theta1 - theta2)
+        alignment_factor = 1.0 - (angle_difference / 90.0) * 0.3  # 30% penalty for max difference
+        
+        # Combine all factors
+        # Base efficiency from directivity
+        # Scaled by angle quality (scattering geometry)
+        # Adjusted by alignment
+        efficiency = directivity * (0.6 + 0.4 * angle_quality) * alignment_factor
+        
+        # # Mode-specific adjustments based on paper's performance statements
+        # if mode == NLOSMode.NLOS_A:
+        #     # Omnidirectional: fundamental limit due to spreading
+        #     efficiency *= 0.85  # Additional penalty for omnidirectional loss
+            
+        # elif mode == NLOSMode.NLOS_B:
+        #     # Good middle ground
+        #     efficiency *= 1.0  # No additional adjustment
+            
+        # elif mode == NLOSMode.NLOS_C:
+        #     # Best performance (from paper: "evidently better")
+        #     efficiency *= 1.15  # Bonus for optimal configuration
+        
+        # Ensure efficiency is in valid range [0.2, 1.0]
+        return np.clip(efficiency, 0.2, 1.0)
     
     @staticmethod
     def get_coverage_type(mode: NLOSMode) -> str:

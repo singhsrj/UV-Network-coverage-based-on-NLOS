@@ -1,4 +1,4 @@
-#Communication parameters for UV NLOS network. Configurable ranges and default values based on the paper.
+# UV COMMUNICATION PARAMETERS (TABLE 1) - Communication parameters for UV NLOS network. Configurable ranges and default values based on the paper.
 
 import numpy as np
 from typing import Dict, Tuple, List

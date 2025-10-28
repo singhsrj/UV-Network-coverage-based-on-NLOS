@@ -231,7 +231,8 @@ class ParameterSweep:
             # Calculate distance
             l = self.calc.calculate_ook_distance(Pt, Rd, theta1, theta2)
             
-            if l <= 0 or not np.isfinite(l):
+            '''This ensures that any configuration must produce at least 5 meter of communication distance to even be considered.'''
+            if l < 1 or not np.isfinite(l):
                 continue
             
             # Calculate requirements

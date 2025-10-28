@@ -27,8 +27,10 @@ class StatisticsUtils:
             raise ValueError("Probability must be in [0, 1]")
         if k > n or k < 0:
             return 0.0
-        
-        return stats.binom.pmf(k, n, p)
+        # New fix
+        return stats.binom.pmf(k, np.float64(n), p)
+        # return stats.binom.pmf(k, np.int_(n), p) # <--- MODIFIED LINE
+        # return stats.binom.pmf(k, n, p)
     
     @staticmethod
     def binomial_cdf(n: int, k: int, p: float) -> float:

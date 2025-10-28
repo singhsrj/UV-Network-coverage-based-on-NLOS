@@ -319,7 +319,14 @@ if __name__ == "__main__":
               f"{design['design']['data_rate']/1e3:<12.0f} "
               f"{design['performance']['robustness_score']:.0f}/100")
     
-    print(f"\n🏆 Best for Cost: {comparison['best_for_cost']['name']} "
-          f"({comparison['best_for_cost']['cost']} nodes)")
-    print(f"🏆 Best for Reliability: {comparison['best_for_reliability']['name']} "
-          f"(score: {comparison['best_for_reliability']['performance']['robustness_score']:.0f})")
+    if comparison['best_for_cost']:
+        print(f"\n🏆 Best for Cost: {comparison['best_for_cost']['name']} "
+              f"({comparison['best_for_cost']['cost']} nodes)")
+    else:
+        print("\n🏆 Best for Cost: No valid design found.")
+
+    if comparison['best_for_reliability']:
+        print(f"🏆 Best for Reliability: {comparison['best_for_reliability']['name']} "
+              f"(score: {comparison['best_for_reliability']['performance']['robustness_score']:.0f})")
+    else:
+        print("🏆 Best for Reliability: No valid design found.")

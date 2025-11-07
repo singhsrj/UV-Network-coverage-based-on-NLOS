@@ -7,12 +7,14 @@ class PhysicalConstants:
     """Physical constants for UV communication"""
     
     # Fundamental Physical Constants
-    PLANCK_CONSTANT = 6.62607015e-34  # J·s (h)
-    SPEED_OF_LIGHT = 2.99792458e8     # m/s (c)
-    
+    PLANCK_CONSTANT = 6.62e-34  # J·s (h)
+    SPEED_OF_LIGHT = 3e8 # m/s (c)    
     # UV Communication Constants (from Table I)
-    WAVELENGTH = 265e-9               # m (λ = 265 nm, solar-blind band)
-    QUANTUM_EFFICIENCY = 0.15         # η = 0.15 (dimensionless)
+    WAVELENGTH = 250e-9               # m (λ = 265 nm, solar-blind band)
+    QUANTUM_EFFICIENCY = 0.045         # η = 0.15 (dimensionless)
+    TRANSMISSION_LOSS = 0.5           # T = 0.5 (dimensionless)
+    BEAM_DIVERGENCE_ANGLE = np.deg2rad(17)
+    FIELD_OF_VIEW_ANGLE = np.deg2rad(30)
     
     # Communication Parameters (defaults from Table I)
     ERROR_PROBABILITY = 1e-6          # Pe = 10^-6

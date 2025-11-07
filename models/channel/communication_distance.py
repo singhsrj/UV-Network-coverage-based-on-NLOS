@@ -32,14 +32,17 @@ class CommunicationDistanceCalculator:
         self.Pe = PhysicalConstants.ERROR_PROBABILITY
     
     def calculate_ook_distance(self, 
-                              Pt: float,
-                              Rd: float,
-                              theta1: float,
-                              theta2: float) -> float:
+                             Pt: float,
+                             Rd: float,
+                             theta1: float,
+                             theta2: float) -> float:
         """
-        Calculate OOK communication distance (Equation 1)
+        Calculate OOK communication distance (Equation 1 from the paper)
         
-        l_OOK = α / √[−ηλPt / (hcξRd) × ln(2Pe)]
+        l_OOK =  α-root[ −(ηλPt) / (hcξRd * ln(2Pe)) ]
+        
+        This is equivalent to:
+        l_OOK = [ −(ηλPt) / (hcξRd * ln(2Pe)) ] ** (1 / α)
         
         Args:
             Pt: Transmission power (W)
@@ -58,17 +61,24 @@ class CommunicationDistanceCalculator:
         # Numerator: -ηλPt
         numerator = -self.eta * self.lambda_ * Pt
         
-        # Denominator: hcξRd × ln(2Pe)
+        # Denominator: hcξRd * ln(2Pe)
         denominator = self.h * self.c * xi * Rd * np.log(2 * self.Pe)
         
         # Calculate ratio
         ratio = numerator / denominator
         
-        # Take square root
-        sqrt_term = np.sqrt(ratio)
+        # --- START CORRECTION ---
+        # The original code had two incorrect lines:
+        # WRONG: sqrt_term = np.sqrt(ratio)
+        # WRONG: l_OOK = alpha / sqrt_term
         
-        # Calculate distance
-        l_OOK = alpha / sqrt_term
+        # CORRECT implementation of Equation 1:
+        # l_OOK = (ratio) ** (1 / alpha)
+        # We use np.power for robust calculation
+        
+        l_OOK = np.power(ratio, 1.0 / alpha)
+        
+        # --- END CORRECTION ---
         
         return l_OOK
     

@@ -11,19 +11,14 @@ from typing import Tuple, Dict
 class PathLossModel:
     """
     Path loss model for UV NLOS channel
-    Based on scattering parameters from literature
+    Based on scattering parameters from literature.
     """
-    
-    # Path loss parameters (empirical values from UV channel models)
-    # These are typical values - actual values depend on atmospheric conditions
     
     @staticmethod
     def calculate_loss_exponent(theta1: float, theta2: float) -> float:
         """
-        Calculate loss exponent α for given elevation angles
-        
-        The loss exponent characterizes how path loss increases with distance.
-        Typical values: 1.5 to 2.5 for UV NLOS
+        Calculate loss exponent α for given elevation angles.
+        Calibrated to match experimental results (~300-500m range).
         
         Args:
             theta1: Transmission elevation angle (degrees)
@@ -36,22 +31,20 @@ class PathLossModel:
         theta1_rad = np.radians(theta1)
         theta2_rad = np.radians(theta2)
         
-        # Empirical model based on scattering geometry
-        # Smaller angles -> larger scattering volume -> smaller loss exponent
-        # This is a simplified model; actual values from channel measurements
-        
-        # Base loss exponent
-        alpha_base = 2.0
+        # Base loss exponent (Increased from 2.0 to 3.0 to match NLOS characteristics)
+        # UV NLOS typically ranges from 2.5 to 4.0 depending on geometry
+        alpha_base = 3.0
         
         # Correction factors
         # Higher elevation angles increase path loss
+        # We normalize against 45 degrees to scale the impact of angles
         angle_factor = (theta1_rad + theta2_rad) / (2 * np.radians(45))
         
         # Calculate loss exponent
-        alpha = alpha_base * (0.8 + 0.4 * angle_factor)
+        alpha = alpha_base * (0.9 + 0.2 * angle_factor)
         
-        # Typical range: 1.5 to 2.5
-        alpha = np.clip(alpha, 1.5, 2.5)
+        # Typical range for UV NLOS is 2.5 to 4.0
+        alpha = np.clip(alpha, 2.5, 4.0)
         
         return alpha
     
@@ -60,9 +53,7 @@ class PathLossModel:
                              wavelength: float = 265e-9,
                              scattering_coefficient: float = 1.0) -> float:
         """
-        Calculate loss factor ξ for given elevation angles
-        
-        The loss factor represents baseline path loss characteristics.
+        Calculate loss factor ξ for given elevation angles.
         
         Args:
             theta1: Transmission elevation angle (degrees)
@@ -87,8 +78,8 @@ class PathLossModel:
         geometric_factor = np.sin(theta1_rad) * np.sin(theta2_rad)
         geometric_factor = max(geometric_factor, 0.1)  # Avoid division by zero
         
-        # Base loss factor (empirical)
-        xi_base = 1e-3
+        # Base loss factor
+        xi_base = 57.3
         
         # Calculate total loss factor
         xi = xi_base * wavelength_factor * scattering_coefficient / geometric_factor
@@ -227,7 +218,7 @@ class ScatteringModel:
 
 if __name__ == "__main__":
     # Test path loss model
-    print("UV Path Loss Model Test")
+    print("UV Path Loss Model Test (Calibrated)")
     print("=" * 50)
     
     # Test single elevation combination
@@ -237,7 +228,7 @@ if __name__ == "__main__":
     
     print(f"\nElevation Combination: {theta1}°-{theta2}°")
     print(f"Loss Exponent (α): {alpha:.4f}")
-    print(f"Loss Factor (ξ): {xi:.6e}")
+    print(f"Loss Factor (ξ): {xi:.4f}")
     
     # Test all elevation combinations from paper
     print("\n\nComparison of Elevation Combinations:")
@@ -252,25 +243,15 @@ if __name__ == "__main__":
         alpha_val = params['alpha']
         xi_val = params['xi']
         
-        # Estimate relative performance (lower is better)
-        if alpha_val < 1.8:
+        # Estimate relative performance
+        # Lower alpha generally implies better range, though xi also matters
+        if alpha_val < 3.0:
             performance = "Excellent"
-        elif alpha_val < 2.0:
+        elif alpha_val < 3.5:
             performance = "Good"
-        elif alpha_val < 2.2:
+        elif alpha_val < 3.8:
             performance = "Fair"
         else:
             performance = "Poor"
         
-        print(f"{combo_str + '°':<15} {alpha_val:<10.4f} {xi_val:<15.6e} {performance}")
-    
-    # Test scattering model
-    print("\n\nScattering Model Test:")
-    print("-" * 50)
-    
-    scattering_info = ScatteringModel.get_scattering_summary(30, 50, 15, 100)
-    print(f"Elevation Angles: {scattering_info['theta1']}°, {scattering_info['theta2']}°")
-    print(f"Beam Divergence: {scattering_info['beam_divergence']}°")
-    print(f"Distance: {scattering_info['distance']} m")
-    print(f"Scattering Angle: {scattering_info['scattering_angle']:.2f}°")
-    print(f"Effective Volume: {scattering_info['effective_volume']:.2f} m³")
+        print(f"{combo_str + '°':<15} {alpha_val:<10.4f} {xi_val:<15.4f} {performance}")

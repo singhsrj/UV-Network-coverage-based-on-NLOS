@@ -81,16 +81,16 @@ class NetworkRobustnessAnalyzer:
         # Robustness level
         if score >= 85:
             level = "Excellent"
-            color = "🟢"
+            color = ""
         elif score >= 70:
             level = "Good"
-            color = "🟡"
+            color = ""
         elif score >= 50:
             level = "Fair"
-            color = "🟠"
+            color = ""
         else:
             level = "Poor"
-            color = "🔴"
+            color = ""
         
         return {
             'score': score,

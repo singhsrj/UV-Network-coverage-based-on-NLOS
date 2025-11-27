@@ -5,7 +5,6 @@ Based on paper's analysis in Section IV.
 Simple explanation:
 - Try many different combinations of parameters
 - Find which combination gives best results
-- Like testing 100 different recipes to find the best one
 """
 
 import numpy as np

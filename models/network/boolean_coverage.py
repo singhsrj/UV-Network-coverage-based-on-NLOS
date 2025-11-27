@@ -15,10 +15,10 @@ import numpy as np
 import sys
 import os
 from typing import List, Tuple
+from utils.geometry import GeometryUtils
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
-from utils.geometry import GeometryUtils
 
 
 class BooleanCoverageModel:

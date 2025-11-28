@@ -23,15 +23,6 @@ from models.connectivity.m_connectivity import MConnectivityCalculator
 
 
 class ElevationOptimizer:
-    """
-    Optimize elevation angles for UV networks.
-    
-    Based on paper's key findings:
-    - Figure 5: Distance vs elevation angle (non-monotonic behavior!)
-    - Section IV: Smaller angles generally better
-    - Four combinations tested: (30,30), (30,50), (50,30), (50,50)
-    - Paper conclusion: "bigger transceiver elevation → more stringent parameters"
-    """
     
     def __init__(self):
         self.calc = CommunicationDistanceCalculator()
@@ -46,19 +37,6 @@ class ElevationOptimizer:
     
     def compare_elevation_combinations(self, Pt: float, Rd: float,
                                       S_ROI: float) -> Dict:
-        """
-        Compare all four elevation combinations from paper
-        
-        Based on paper's Section IV-B analysis across Figures 10-18
-        
-        Args:
-            Pt: Transmission power (W)
-            Rd: Data rate (bps)
-            S_ROI: Coverage area (m²)
-            
-        Returns:
-            Comparison of all four combinations
-        """
         results = {}
         
         for theta1, theta2 in self.ELEVATION_COMBINATIONS:
@@ -97,21 +75,6 @@ class ElevationOptimizer:
     
     def find_best_angles_for_distance(self, target_distance: float,
                                      Pt: float, Rd: float) -> Dict:
-        """
-        Find angle combination that achieves target distance
-        
-        Simple explanation:
-        - "I need X meters range"
-        - "Which angles work?"
-        - Test all combinations, find feasible ones
-        
-        Args:
-            target_distance: Desired distance (m)
-            Pt, Rd: Fixed power and rate
-            
-        Returns:
-            Best angle combinations
-        """
         feasible = []
         
         for theta1, theta2 in self.ELEVATION_COMBINATIONS:
@@ -143,21 +106,6 @@ class ElevationOptimizer:
     
     def find_best_angles_for_nodes(self, max_nodes: int, S_ROI: float,
                                   Pt: float, Rd: float) -> Dict:
-        """
-        Find angles that minimize nodes for coverage
-        
-        Simple explanation:
-        - "I can only afford N devices"
-        - "Which angles let me cover the area?"
-        
-        Args:
-            max_nodes: Maximum available nodes
-            S_ROI: Area to cover (m²)
-            Pt, Rd: Fixed parameters
-            
-        Returns:
-            Best angle combination
-        """
         feasible = []
         
         for theta1, theta2 in self.ELEVATION_COMBINATIONS:
@@ -190,17 +138,6 @@ class ElevationOptimizer:
         }
     
     def analyze_angle_sensitivity(self, Pt: float, Rd: float, S_ROI: float) -> Dict:
-        """
-        Analyze sensitivity to angle changes
-        Reproduces Figure 5 analysis from paper
-        
-        Args:
-            Pt, Rd: Fixed parameters
-            S_ROI: Coverage area
-            
-        Returns:
-            Sensitivity analysis
-        """
         # Test transmission angles from 30° to 50° (Figure 5)
         theta1_range = np.arange(30, 51, 5)
         theta2_fixed = 50  # Reception angle fixed (like Figure 5)
@@ -232,25 +169,6 @@ class ElevationOptimizer:
         return results
     
     def recommend_angles(self, requirements: Dict) -> Dict:
-        """
-        Recommend best angle combination based on requirements
-        
-        Simple explanation:
-        - Tell system your needs
-        - Get recommendation with reasoning
-        
-        Requirements can include:
-        - 'min_distance': Minimum distance needed
-        - 'max_nodes': Maximum nodes available
-        - 'target_connectivity': Target connectivity probability
-        - 'priority': 'cost' (minimize nodes) or 'reliability' (maximize connectivity)
-        
-        Args:
-            requirements: Dictionary with requirements
-            
-        Returns:
-            Recommendation with justification
-        """
         Pt = requirements.get('Pt', 0.5)
         Rd = requirements.get('Rd', 50e3)
         S_ROI = requirements.get('S_ROI', 1e6)

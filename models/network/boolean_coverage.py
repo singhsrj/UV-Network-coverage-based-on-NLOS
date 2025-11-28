@@ -22,36 +22,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 
 class BooleanCoverageModel:
-    """
-    Boolean (0-1) coverage model.
-    Based on Equation 2 and Figure 6 from the paper.
-    
-    Simple explanation:
-    - Binary states: covered (1) or not covered (0)
-    - A point is covered if distance to node < coverage radius
-    - No partial coverage - either you're in range or you're not
-    """
-    
     @staticmethod
     def is_point_covered(point: Tuple[float, float],
                         node_position: Tuple[float, float],
                         coverage_radius: float) -> bool:
-        """
-        Check if a point is covered by a single node (Equation 2)
-        
-        Simple explanation:
-        - Calculate distance from point to node
-        - If distance < radius: covered (True)
-        - If distance >= radius: not covered (False)
-        
-        Args:
-            point: (x, y) coordinates of point to check
-            node_position: (x, y) coordinates of node
-            coverage_radius: Node's coverage radius R
-            
-        Returns:
-            True if covered, False otherwise
-        """
         px, py = point
         nx, ny = node_position
         
@@ -66,22 +40,6 @@ class BooleanCoverageModel:
     def is_point_covered_by_network(point: Tuple[float, float],
                                     node_positions: List[Tuple[float, float]],
                                     coverage_radius: float) -> bool:
-        """
-        Check if point is covered by any node in network
-        
-        Simple explanation:
-        - Check all nodes
-        - If ANY node covers the point: return True
-        - If NO node covers the point: return False
-        
-        Args:
-            point: (x, y) coordinates of point
-            node_positions: List of (x, y) node coordinates
-            coverage_radius: Coverage radius for all nodes
-            
-        Returns:
-            True if covered by at least one node
-        """
         for node_pos in node_positions:
             if BooleanCoverageModel.is_point_covered(point, node_pos, coverage_radius):
                 return True
@@ -91,19 +49,6 @@ class BooleanCoverageModel:
     def calculate_coverage_rate(point: Tuple[float, float],
                                node_position: Tuple[float, float],
                                coverage_radius: float) -> float:
-        """
-        Calculate coverage rate at a point (for Equation 2)
-        
-        Returns 1.0 or 0.0 (Boolean model)
-        
-        Args:
-            point: (x, y) coordinates
-            node_position: (x, y) node coordinates
-            coverage_radius: Coverage radius
-            
-        Returns:
-            1.0 if covered, 0.0 if not covered
-        """
         is_covered = BooleanCoverageModel.is_point_covered(
             point, node_position, coverage_radius
         )
@@ -113,23 +58,6 @@ class BooleanCoverageModel:
     def count_covering_nodes(point: Tuple[float, float],
                             node_positions: List[Tuple[float, float]],
                             coverage_radius: float) -> int:
-        """
-        Count how many nodes cover a given point
-        
-        Simple explanation:
-        - More nodes covering = more redundancy = more reliable
-        - 0 nodes = no coverage
-        - 1 node = basic coverage
-        - 2+ nodes = redundant coverage (better!)
-        
-        Args:
-            point: (x, y) coordinates
-            node_positions: List of node positions
-            coverage_radius: Coverage radius
-            
-        Returns:
-            Number of nodes that cover this point
-        """
         count = 0
         for node_pos in node_positions:
             if BooleanCoverageModel.is_point_covered(point, node_pos, coverage_radius):
@@ -141,23 +69,6 @@ class BooleanCoverageModel:
                                node_positions: List[Tuple[float, float]],
                                coverage_radius: float,
                                grid_resolution: int = 100) -> float:
-        """
-        Calculate what fraction of an area is covered
-        
-        Simple explanation:
-        - Divide area into a grid of points
-        - Check each point: covered or not?
-        - Coverage ratio = (covered points) / (total points)
-        
-        Args:
-            region_bounds: (x_min, x_max, y_min, y_max)
-            node_positions: List of node positions
-            coverage_radius: Coverage radius
-            grid_resolution: Number of grid points per dimension
-            
-        Returns:
-            Coverage ratio (0.0 to 1.0)
-        """
         x_min, x_max, y_min, y_max = region_bounds
         
         # Create grid of test points
@@ -185,23 +96,6 @@ class BooleanCoverageModel:
                              node_positions: List[Tuple[float, float]],
                              coverage_radius: float,
                              grid_resolution: int = 50) -> np.ndarray:
-        """
-        Generate 2D coverage map
-        
-        Simple explanation:
-        - Create a grid showing which areas are covered
-        - 1 = covered, 0 = not covered
-        - Can be used to visualize coverage
-        
-        Args:
-            region_bounds: (x_min, x_max, y_min, y_max)
-            node_positions: List of node positions
-            coverage_radius: Coverage radius
-            grid_resolution: Grid size
-            
-        Returns:
-            2D array where 1 = covered, 0 = not covered
-        """
         x_min, x_max, y_min, y_max = region_bounds
         
         # Create grid
@@ -227,23 +121,6 @@ class BooleanCoverageModel:
                                node_positions: List[Tuple[float, float]],
                                coverage_radius: float,
                                grid_resolution: int = 50) -> np.ndarray:
-        """
-        Generate redundancy map showing how many nodes cover each point
-        
-        Simple explanation:
-        - Shows overlap between nodes
-        - Higher values = more redundancy = more reliable
-        - Values: 0 (no coverage), 1, 2, 3, etc. (number of covering nodes)
-        
-        Args:
-            region_bounds: (x_min, x_max, y_min, y_max)
-            node_positions: List of node positions
-            coverage_radius: Coverage radius
-            grid_resolution: Grid size
-            
-        Returns:
-            2D array with count of covering nodes at each point
-        """
         x_min, x_max, y_min, y_max = region_bounds
         
         x_points = np.linspace(x_min, x_max, grid_resolution)

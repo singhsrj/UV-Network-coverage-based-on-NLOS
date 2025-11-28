@@ -88,7 +88,6 @@ def demo_phase2_coverage_analysis():
     
     print(f"Communication Distance: {l} m\n")
     
-    # Calculate coverage metrics
     S_4_eff = EffectiveCoverageCalculator.calculate_four_node_effective_coverage(l)
     S_eff = EffectiveCoverageCalculator.calculate_single_node_effective_coverage(l)
     eta_eff = EffectiveCoverageCalculator.calculate_coverage_efficiency()
@@ -399,9 +398,9 @@ def main():
         S_eff, n_min = demo_phase2_coverage_analysis()
         print("\n")
 
-        req_nodes = demo_phase3_connectivity()
+        # req_nodes = demo_phase3_connectivity()
         # demo_phase4_optimization()
-        print("\n")
+        # print("\n")
 
         demo_phase5_network_design()
         # demo_phase6_robustness_analysis()
@@ -410,12 +409,10 @@ def main():
         # Summary
         print_section("DEMONSTRATION COMPLETE")
         
-        print(" All Phases Executed Successfully!\n")
         print("Key Results Summary:")
         print(f"  • Communication Distance: {distance:.2f} m")
         print(f"  • Single-Node Coverage: {S_eff:.0f} m²")
         print(f"  • Min Nodes (1km²): {n_min}")
-        print(f"  • Req for 90% 2-Conn: {req_nodes}")        
         
     except Exception as e:
         print(f"\n Error during demonstration: {e}")

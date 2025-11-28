@@ -22,15 +22,6 @@ from models.connectivity.m_connectivity import MConnectivityCalculator
 
 
 class RateOptimizer:
-    """
-    Optimize data rate for UV networks.
-    
-    Based on paper's analysis:
-    - Rate range: 10-120 kbps (from Figures 13-14, 17)
-    - Higher rate → shorter distance (SNR requirement)
-    - Figure 13-14: Coverage vs rate for 4-node and single-node
-    - Figure 17: Connectivity vs rate for different m-connectivity
-    """
     
     def __init__(self):
         self.calc = CommunicationDistanceCalculator()
@@ -41,22 +32,6 @@ class RateOptimizer:
     
     def find_maximum_rate_for_distance(self, target_distance: float,
                                        Pt: float, theta1: float, theta2: float) -> Dict:
-        """
-        Find maximum data rate that achieves target distance
-        
-        Simple explanation:
-        - "I need to reach X meters"
-        - "What's the fastest data rate I can use?"
-        - Binary search to find maximum rate
-        
-        Args:
-            target_distance: Required distance (m)
-            Pt: Transmission power (W)
-            theta1, theta2: Elevation angles (degrees)
-            
-        Returns:
-            Maximum achievable rate
-        """
         # Check if achievable with slowest rate
         min_distance = self.calc.calculate_ook_distance(Pt, self.RD_MAX, theta1, theta2)
         if min_distance < target_distance:
@@ -98,25 +73,6 @@ class RateOptimizer:
     def find_rate_for_connectivity(self, S_ROI: float, n: int, m: int,
                                   target_prob: float, Pt: float,
                                   theta1: float, theta2: float) -> Dict:
-        """
-        Find maximum rate for target connectivity
-        
-        Simple explanation:
-        - "I want 90% 2-connectivity"
-        - "What's the fastest rate I can use?"
-        
-        Based on Figure 17 from paper
-        
-        Args:
-            S_ROI: Coverage area (m²)
-            n: Number of nodes
-            m: Connectivity level
-            target_prob: Target connectivity probability
-            Pt, theta1, theta2: Fixed parameters
-            
-        Returns:
-            Maximum rate for connectivity
-        """
         Rd_low = self.RD_MIN
         Rd_high = self.RD_MAX
         tolerance = 1e3
@@ -153,18 +109,6 @@ class RateOptimizer:
     
     def analyze_rate_impact(self, Rd_range: np.ndarray, Pt: float,
                            theta1: float, theta2: float, S_ROI: float) -> Dict:
-        """
-        Analyze impact of data rate on network metrics
-        Reproduces Figures 13-14 and 17 analysis from paper
-        
-        Args:
-            Rd_range: Range of rates to test (bps)
-            Pt, theta1, theta2: Fixed communication parameters
-            S_ROI: Coverage area (m²)
-            
-        Returns:
-            Complete rate analysis
-        """
         results = {
             'Rd_values': Rd_range,
             'distances': [],
@@ -208,24 +152,6 @@ class RateOptimizer:
         return results
     
     def recommend_rate(self, requirements: Dict) -> Dict:
-        """
-        Recommend optimal data rate based on requirements
-        
-        Simple explanation:
-        - Tell system your needs
-        - Get rate recommendation with reasoning
-        
-        Requirements can include:
-        - 'min_distance': Minimum distance needed
-        - 'target_connectivity': Target connectivity
-        - 'priority': 'speed' (max rate) or 'range' (max distance)
-        
-        Args:
-            requirements: Dictionary with requirements
-            
-        Returns:
-            Rate recommendation
-        """
         Pt = requirements.get('Pt', 0.5)
         theta1 = requirements.get('theta1', 30)
         theta2 = requirements.get('theta2', 50)

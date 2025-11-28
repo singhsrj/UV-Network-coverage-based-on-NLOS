@@ -20,33 +20,9 @@ from models.connectivity.probability_density import ProbabilityDensityFunction
 
 
 class NetworkRobustnessAnalyzer:
-    """
-    Analyze network robustness and reliability.
-    
-    Simple explanation:
-    - Takes network parameters
-    - Calculates how robust/reliable it is
-    - Gives recommendations for improvement
-    """
     
     @staticmethod
     def evaluate_robustness(l: float, n: int, area: float) -> Dict:
-        """
-        Evaluate overall network robustness
-        
-        Simple explanation:
-        - Calculates multiple robustness metrics
-        - Gives overall "health score"
-        - Like a report card for your network
-        
-        Args:
-            l: Communication distance (meters)
-            n: Number of nodes
-            area: Network area (m²)
-            
-        Returns:
-            Comprehensive robustness report
-        """
         # Calculate connectivity probabilities
         conn_1 = MConnectivityCalculator.calculate_network_connectivity_probability(
             l, n, 1, area
@@ -113,23 +89,6 @@ class NetworkRobustnessAnalyzer:
     @staticmethod
     def analyze_failure_tolerance(l: float, n: int, area: float,
                                   failure_rate: float = 0.1) -> Dict:
-        """
-        Analyze network tolerance to node failures
-        
-        Simple explanation:
-        - "What if some nodes break?"
-        - Can the network still work?
-        - How many failures can we tolerate?
-        
-        Args:
-            l: Communication distance
-            n: Number of nodes
-            area: Network area
-            failure_rate: Expected failure rate (e.g., 0.1 = 10%)
-            
-        Returns:
-            Failure tolerance analysis
-        """
         # Number of expected failures
         expected_failures = int(n * failure_rate)
         
@@ -157,22 +116,6 @@ class NetworkRobustnessAnalyzer:
     
     @staticmethod
     def recommend_improvements(l: float, n: int, area: float) -> List[str]:
-        """
-        Generate improvement recommendations
-        
-        Simple explanation:
-        - Analyzes current network
-        - Suggests what to improve
-        - Practical advice for network planning
-        
-        Args:
-            l: Communication distance
-            n: Number of nodes
-            area: Network area
-            
-        Returns:
-            List of recommendation strings
-        """
         recommendations = []
         
         # Get current robustness
@@ -228,20 +171,6 @@ class NetworkRobustnessAnalyzer:
     
     @staticmethod
     def compare_scenarios(scenarios: List[Dict]) -> Dict:
-        """
-        Compare multiple network scenarios
-        
-        Simple explanation:
-        - "Option A: 100 nodes with 0.5W power"
-        - "Option B: 150 nodes with 0.3W power"
-        - Which is better?
-        
-        Args:
-            scenarios: List of dicts with 'name', 'l', 'n', 'area'
-            
-        Returns:
-            Comparison results
-        """
         results = {}
         
         for scenario in scenarios:
@@ -269,17 +198,6 @@ class NetworkRobustnessAnalyzer:
     
     @staticmethod
     def generate_report(l: float, n: int, area: float) -> str:
-        """
-        Generate human-readable network robustness report
-        
-        Args:
-            l: Communication distance
-            n: Number of nodes
-            area: Network area
-            
-        Returns:
-            Formatted report string
-        """
         robustness = NetworkRobustnessAnalyzer.evaluate_robustness(l, n, area)
         failure_analysis = NetworkRobustnessAnalyzer.analyze_failure_tolerance(l, n, area)
         recommendations = NetworkRobustnessAnalyzer.recommend_improvements(l, n, area)

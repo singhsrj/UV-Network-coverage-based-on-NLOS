@@ -117,19 +117,7 @@ class CommunicationDistanceCalculator:
                                        Rd: float,
                                        theta1_range: np.ndarray,
                                        theta2: float) -> np.ndarray:
-        """
-        Calculate distance for range of transmission elevation angles
-        Used to reproduce Fig. 5
-        
-        Args:
-            Pt: Transmission power (W)
-            Rd: Data rate (bps)
-            theta1_range: Array of transmission elevation angles (degrees)
-            theta2: Reception elevation angle (degrees)
-            
-        Returns:
-            Array of communication distances (m)
-        """
+
         distances = np.array([
             self.calculate_ook_distance(Pt, Rd, theta1, theta2)
             for theta1 in theta1_range
@@ -141,18 +129,7 @@ class CommunicationDistanceCalculator:
                                  Rd: float,
                                  theta1_range: np.ndarray,
                                  theta2_range: np.ndarray) -> np.ndarray:
-        """
-        Calculate distance matrix for elevation angle combinations
-        
-        Args:
-            Pt: Transmission power (W)
-            Rd: Data rate (bps)
-            theta1_range: Array of transmission elevation angles (degrees)
-            theta2_range: Array of reception elevation angles (degrees)
-            
-        Returns:
-            2D array of communication distances (m)
-        """
+
         distances = np.zeros((len(theta1_range), len(theta2_range)))
         
         for i, theta1 in enumerate(theta1_range):
@@ -165,17 +142,7 @@ class CommunicationDistanceCalculator:
                            Pt: float,
                            Rd: float,
                            elevation_combinations: list) -> dict:
-        """
-        Get distance summary for multiple elevation combinations
-        
-        Args:
-            Pt: Transmission power (W)
-            Rd: Data rate (bps)
-            elevation_combinations: List of (theta1, theta2) tuples
-            
-        Returns:
-            Dictionary mapping combinations to distances
-        """
+
         results = {}
         
         for theta1, theta2 in elevation_combinations:
@@ -204,21 +171,7 @@ class CommunicationDistanceCalculator:
                           Pt_min: float = 0.01,
                           Pt_max: float = 1.0,
                           tolerance: float = 0.001) -> float:
-        """
-        Find required transmission power for target distance
-        
-        Args:
-            target_distance: Desired communication distance (m)
-            Rd: Data rate (bps)
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            Pt_min: Minimum power to search (W)
-            Pt_max: Maximum power to search (W)
-            tolerance: Search tolerance (m)
-            
-        Returns:
-            Required transmission power (W)
-        """
+
         # Binary search
         while (Pt_max - Pt_min) > 0.001:
             Pt_mid = (Pt_min + Pt_max) / 2
@@ -238,20 +191,7 @@ class CommunicationDistanceCalculator:
                           theta2: float,
                           Rd_min: float = 1e3,
                           Rd_max: float = 200e3) -> float:
-        """
-        Find maximum supported data rate for given distance
-        
-        Args:
-            distance: Communication distance (m)
-            Pt: Transmission power (W)
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            Rd_min: Minimum rate to search (bps)
-            Rd_max: Maximum rate to search (bps)
-            
-        Returns:
-            Maximum supported data rate (bps)
-        """
+
         # Binary search
         while (Rd_max - Rd_min) > 1000:
             Rd_mid = (Rd_min + Rd_max) / 2

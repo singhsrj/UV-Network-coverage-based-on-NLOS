@@ -14,18 +14,6 @@ class IntegrationUtils:
     
     @staticmethod
     def integrate_1d(func: Callable, a: float, b: float, method: str = 'quad', **kwargs) -> Tuple[float, float]:
-        """
-        Numerical integration in 1D
-        
-        Args:
-            func: Function to integrate
-            a, b: Integration bounds
-            method: Integration method ('quad', 'trapz', 'simps')
-            **kwargs: Additional arguments for integration method
-            
-        Returns:
-            (result, error): Integration result and error estimate
-        """
         if method == 'dblquad':
             # Double integration using scipy
             x_min, x_max = x_bounds
@@ -64,19 +52,6 @@ class IntegrationUtils:
                        r_bounds: Tuple[float, float],
                        phi_bounds: Tuple[float, float],
                        **kwargs) -> Tuple[float, float]:
-        """
-        Numerical integration in polar coordinates
-        Used for connectivity analysis (Equations 20-25)
-        
-        Args:
-            func: Function to integrate f(r, phi)
-            r_bounds: (r_min, r_max) radial bounds
-            phi_bounds: (phi_min, phi_max) angular bounds (radians)
-            **kwargs: Additional arguments
-            
-        Returns:
-            (result, error): Integration result and error estimate
-        """
         def integrand_cartesian(phi, r):
             # Convert to Cartesian with Jacobian r
             return func(r, phi) * r
@@ -99,18 +74,6 @@ class IntegrationUtils:
                                    center: Tuple[float, float],
                                    radius: float,
                                    **kwargs) -> Tuple[float, float]:
-        """
-        Integrate over circular region
-        
-        Args:
-            func: Function to integrate f(x, y)
-            center: (cx, cy) circle center
-            radius: Circle radius
-            **kwargs: Additional arguments
-            
-        Returns:
-            (result, error): Integration result and error estimate
-        """
         cx, cy = center
         
         def func_polar(phi, r):
@@ -135,21 +98,6 @@ class IntegrationUtils:
                                    semi_minor: float,
                                    rotation: float = 0,
                                    **kwargs) -> Tuple[float, float]:
-        """
-        Integrate over elliptical region
-        Used for single-side coverage (Section III-B-1)
-        
-        Args:
-            func: Function to integrate f(x, y)
-            center: (cx, cy) ellipse center
-            semi_major: Semi-major axis length
-            semi_minor: Semi-minor axis length
-            rotation: Rotation angle in radians
-            **kwargs: Additional arguments
-            
-        Returns:
-            (result, error): Integration result and error estimate
-        """
         cx, cy = center
         
         def func_parametric(theta, r):
@@ -182,10 +130,6 @@ class IntegrationUtils:
 
 
 class ConnectivityIntegrator:
-    """
-    Specialized integrator for connectivity calculations (Section III-C)
-    Implements Equations 20-25
-    """
     
     @staticmethod
     def integrate_adjacent_probability(
@@ -194,19 +138,6 @@ class ConnectivityIntegrator:
         communication_distance: float,
         **kwargs
     ) -> float:
-        """
-        Calculate probability that a node has adjacent nodes
-        Implements Equation 22
-        
-        Args:
-            pdf: Probability density function U(t*cos(φ), t*sin(φ))
-            node_position: (tx, φx) position in polar coordinates
-            communication_distance: l (communication distance)
-            **kwargs: Integration parameters
-            
-        Returns:
-            P(tx, φx, l): Probability of having adjacent nodes
-        """
         tx, phi_x = node_position
         l = communication_distance
         

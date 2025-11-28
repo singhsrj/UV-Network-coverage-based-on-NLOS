@@ -33,17 +33,6 @@ class NLOSScatteringModel:
     
     @staticmethod
     def get_mode_characteristics(mode: NLOSMode, theta1: float, theta2: float) -> Dict:
-        """
-        Get characteristics of each NLOS mode
-        
-        Args:
-            mode: NLOS mode (a, b, or c)
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            
-        Returns:
-            Dictionary with mode characteristics
-        """
         if mode == NLOSMode.NLOS_A:
             # Vertical transmission and reception
             # Coverage is circular (symmetric in all directions)
@@ -94,16 +83,7 @@ class NLOSScatteringModel:
     
     @staticmethod
     def determine_mode(theta1: float, theta2: float) -> NLOSMode:
-        """
-        Determine NLOS mode based on elevation angles
-        
-        Args:
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            
-        Returns:
-            Appropriate NLOS mode
-        """
+
         # Vertical means 90 degrees
         is_theta1_vertical = abs(theta1 - 90) < 5
         is_theta2_vertical = abs(theta2 - 90) < 5
@@ -120,27 +100,7 @@ class NLOSScatteringModel:
     
     @staticmethod
     def calculate_scattering_efficiency(theta1: float, theta2: float, mode: NLOSMode) -> float:
-        """
-        Calculate scattering efficiency for given angles and mode
         
-        Physical basis:
-        - Scattering efficiency depends on geometry and directionality
-        - Forward scattering is more efficient than omnidirectional
-        - Lower elevation angles concentrate energy better
-        
-        The efficiency is calculated based on:
-        1. Directivity factor (how focused the beam is)
-        2. Angle optimization (lower angles = better forward scattering)
-        3. Geometric losses
-        
-        Args:
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            mode: NLOS mode
-            
-        Returns:
-            Scattering efficiency (0 to 1)
-        """
         theta1_rad = np.radians(theta1)
         theta2_rad = np.radians(theta2)
         
@@ -221,16 +181,6 @@ class NLOSScatteringModel:
     
     @staticmethod
     def compare_modes(theta1: float, theta2: float) -> Dict:
-        """
-        Compare all three NLOS modes for given angles
-        
-        Args:
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            
-        Returns:
-            Comparison dictionary
-        """
         results = {}
         
         for mode in NLOSMode:

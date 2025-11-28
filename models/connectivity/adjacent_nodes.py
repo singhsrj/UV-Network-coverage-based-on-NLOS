@@ -20,39 +20,12 @@ from models.connectivity.probability_density import ProbabilityDensityFunction
 
 
 class AdjacentNodesCalculator:
-    """
-    Calculate probability of having adjacent (neighboring) nodes.
-    
-    Simple explanation:
-    - "Adjacent" = within communication distance
-    - We calculate: P(node X has at least m neighbors)
-    - Uses integration over the coverage circle
-    """
     
     @staticmethod
     def calculate_coverage_probability(node_distance: float,
                                       communication_distance: float,
                                       n: int,
                                       area: float) -> float:
-        """
-        Calculate probability that coverage area contains other nodes
-        
-        Simple explanation:
-        - Draw a circle of radius l around node
-        - What's the probability other nodes are in that circle?
-        - P = (density of nodes) × (circle area)
-        
-        This is a simplified version before full integration (Equations 20-22)
-        
-        Args:
-            node_distance: Distance of node from origin (meters)
-            communication_distance: Communication range l (meters)
-            n: Total nodes in network
-            area: Network area (square meters)
-            
-        Returns:
-            Probability that coverage area contains nodes
-        """
         # Density of other nodes (excluding the node itself)
         density = (n - 1) / area
         
@@ -69,24 +42,6 @@ class AdjacentNodesCalculator:
     @staticmethod
     def calculate_adjacent_probability_simple(tx: float, phi_x: float,
                                              l: float, n: int, area: float) -> float:
-        """
-        Simplified calculation of P(tx, φx, l) from Equation 22
-        
-        Simple explanation:
-        - For a node at polar position (tx, φx)
-        - Calculate probability it has neighbors within distance l
-        - Uses circular coverage approximation
-        
-        Args:
-            tx: Radial distance from origin (meters)
-            phi_x: Angular position (radians)
-            l: Communication distance (meters)
-            n: Total nodes
-            area: Network area
-            
-        Returns:
-            P(tx, φx, l): Probability of having adjacent nodes
-        """
         # Calculate Cartesian position
         x = tx * np.cos(phi_x)
         y = tx * np.sin(phi_x)
@@ -117,26 +72,6 @@ class AdjacentNodesCalculator:
     @staticmethod
     def probability_m_adjacent_nodes(tx: float, phi_x: float, l: float,
                                     n: int, m: int, area: float) -> float:
-        """
-        Probability of having exactly m adjacent nodes (Equation 23)
-        
-        Simple explanation:
-        - P_m = probability of having EXACTLY m neighbors
-        - Uses binomial distribution
-        - Like: "What's chance of having exactly 3 friends in your circle?"
-        
-        Equation 23: P_m(tx, φx, l) = C(n-1, m) × P^m × (1-P)^(n-1-m)
-        
-        Args:
-            tx, phi_x: Node position (polar coordinates)
-            l: Communication distance
-            n: Total nodes in network
-            m: Number of adjacent nodes
-            area: Network area
-            
-        Returns:
-            Probability of having exactly m adjacent nodes
-        """
         # Get probability that one node is adjacent
         P = AdjacentNodesCalculator.calculate_adjacent_probability_simple(
             tx, phi_x, l, n, area
@@ -150,26 +85,6 @@ class AdjacentNodesCalculator:
     @staticmethod
     def probability_at_least_m_adjacent(tx: float, phi_x: float, l: float,
                                        n: int, m: int, area: float) -> float:
-        """
-        Probability of having at least m adjacent nodes (Equation 24)
-        
-        Simple explanation:
-        - P_≥m = probability of having m OR MORE neighbors
-        - Important for connectivity requirements
-        - Like: "What's chance of having at least 2 friends nearby?"
-        
-        Equation 24: P_≥m = 1 - Σ(s=0 to m-1) P_s
-        
-        Args:
-            tx, phi_x: Node position
-            l: Communication distance
-            n: Total nodes
-            m: Minimum adjacent nodes
-            area: Network area
-            
-        Returns:
-            Probability of having at least m adjacent nodes
-        """
         # Get base probability
         P = AdjacentNodesCalculator.calculate_adjacent_probability_simple(
             tx, phi_x, l, n, area
@@ -183,18 +98,6 @@ class AdjacentNodesCalculator:
     @staticmethod
     def analyze_node_position(tx: float, phi_x: float, l: float,
                              n: int, area: float) -> Dict:
-        """
-        Complete analysis of node at given position
-        
-        Args:
-            tx, phi_x: Node position (polar)
-            l: Communication distance
-            n: Total nodes
-            area: Network area
-            
-        Returns:
-            Dictionary with connectivity analysis
-        """
         # Convert to Cartesian
         x = tx * np.cos(phi_x)
         y = tx * np.sin(phi_x)
@@ -228,25 +131,6 @@ class AdjacentNodesCalculator:
     @staticmethod
     def find_critical_positions(l: float, n: int, area: float,
                                m: int, target_prob: float = 0.9) -> Dict:
-        """
-        Find positions where connectivity requirements are met/not met
-        
-        Simple explanation:
-        - Some positions are better connected than others
-        - Center nodes usually have more neighbors
-        - Corner/edge nodes have fewer neighbors
-        - This finds the "critical" positions
-        
-        Args:
-            l: Communication distance
-            n: Number of nodes
-            area: Network area
-            m: Connectivity requirement
-            target_prob: Target probability (e.g., 0.9 for 90%)
-            
-        Returns:
-            Analysis of critical positions
-        """
         side = np.sqrt(area)
         
         # Test several positions

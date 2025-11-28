@@ -22,24 +22,8 @@ from models.connectivity.m_connectivity import MConnectivityCalculator
 
 
 class ParameterSweep:
-    """
-    Multi-dimensional parameter sweep for optimization.
-    
-    Based on paper's parameter ranges:
-    - Transmission power: 0.1-0.5W (from Table I and experiments)
-    - Data rate: 10-120 kbps (from Figures 13-14, 17)
-    - Elevation angles: 30°, 40°, 50° (from Figure 5 and Section IV)
-    - Node count: Variable based on coverage requirements
-    """
     
     def __init__(self, S_ROI: float = 1e6, target_connectivity: float = 0.9):
-        """
-        Initialize parameter sweep
-        
-        Args:
-            S_ROI: Region of interest area (default: 1km² from paper)
-            target_connectivity: Target connectivity probability (default: 90% from paper)
-        """
         self.S_ROI = S_ROI
         self.target_connectivity = target_connectivity
         self.calc = CommunicationDistanceCalculator()
@@ -54,22 +38,6 @@ class ParameterSweep:
     
     def sweep_1d(self, param_name: str, param_values: np.ndarray,
                  fixed_params: Dict) -> Dict:
-        """
-        Sweep single parameter while keeping others fixed
-        
-        Simple explanation:
-        - Change ONE parameter at a time
-        - See how it affects distance, coverage, connectivity
-        - Like testing different oven temperatures with same recipe
-        
-        Args:
-            param_name: Name of parameter to sweep ('Pt', 'Rd', 'theta1', 'theta2')
-            param_values: Values to test
-            fixed_params: Fixed values for other parameters
-            
-        Returns:
-            Dictionary with sweep results
-        """
         results = {
             'param_name': param_name,
             'param_values': param_values,
@@ -131,24 +99,6 @@ class ParameterSweep:
     def sweep_2d(self, param1_name: str, param1_values: np.ndarray,
                  param2_name: str, param2_values: np.ndarray,
                  fixed_params: Dict) -> Dict:
-        """
-        Sweep two parameters simultaneously
-        
-        Simple explanation:
-        - Change TWO parameters together
-        - Creates a grid of combinations
-        - Like testing temperature AND time combinations
-        
-        Args:
-            param1_name: First parameter name
-            param1_values: Values for first parameter
-            param2_name: Second parameter name
-            param2_values: Values for second parameter
-            fixed_params: Fixed values for other parameters
-            
-        Returns:
-            Dictionary with 2D sweep results
-        """
         results = {
             'param1_name': param1_name,
             'param1_values': param1_values,
@@ -190,26 +140,6 @@ class ParameterSweep:
     
     def find_optimal_configuration(self, objective: str = 'min_nodes',
                                   constraints: Optional[Dict] = None) -> Dict:
-        """
-        Find optimal parameter configuration
-        
-        Simple explanation:
-        - Test ALL reasonable combinations
-        - Find the best one based on your goal
-        - Goals: minimize nodes, maximize connectivity, etc.
-        
-        Objectives from paper:
-        - 'min_nodes': Minimize number of nodes (cost optimization)
-        - 'max_connectivity': Maximize 2-connectivity (reliability)
-        - 'balanced': Balance between cost and reliability
-        
-        Args:
-            objective: Optimization objective
-            constraints: Constraints (e.g., {'min_connectivity': 0.9})
-            
-        Returns:
-            Optimal configuration and metrics
-        """
         if constraints is None:
             constraints = {'min_connectivity_2': self.target_connectivity}
         

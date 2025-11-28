@@ -21,41 +21,9 @@ from models.connectivity.adjacent_nodes import AdjacentNodesCalculator
 
 
 class MConnectivityCalculator:
-    """
-    Calculate m-connectivity probabilities for networks.
-    
-    Simple explanation:
-    - Answers: "What's the probability my whole network is m-connected?"
-    - m-connected = every single node has at least m neighbors
-    - Higher m = more robust but harder to achieve
-    """
-    
     @staticmethod
     def calculate_Q_n_m(l: float, n: int, m: int, area: float,
                        sample_points: int = 20) -> float:
-        """
-        Calculate Q_n,≥m(l): Probability that arbitrary node has ≥m neighbors
-        
-        This is Equation 25 from the paper (integrated over the network area)
-        
-        Simple explanation:
-        - Sample many random positions in the network
-        - For each position, calculate P(≥m neighbors)
-        - Average them all together
-        - This gives overall probability for "any random node"
-        
-        Equation 25: Q_n,≥m(l) = ∫∫ U(t cos φ, t sin φ) P_≥m(tx, φx, l) t dφ dt
-        
-        Args:
-            l: Communication distance (meters)
-            n: Number of nodes
-            m: Connectivity level
-            area: Network area (square meters)
-            sample_points: Number of positions to sample
-            
-        Returns:
-            Q_n,≥m(l): Probability that a random node has ≥m neighbors
-        """
         side = np.sqrt(area)
         
         # Sample points throughout the network
@@ -91,26 +59,6 @@ class MConnectivityCalculator:
     def calculate_network_connectivity_probability(l: float, n: int, m: int,
                                                   area: float,
                                                   sample_points: int = 20) -> float:
-        """
-        Calculate P(network is m-connected) using Equation 27
-        
-        Simple explanation:
-        - For the WHOLE network to be m-connected
-        - EVERY SINGLE node must have ≥m neighbors
-        - Probability = (Q_n,≥m)^n (all nodes must satisfy)
-        
-        Equation 27: P(C is m-connected) ≈ (Q_n,≥m(l))^n
-        
-        Args:
-            l: Communication distance
-            n: Number of nodes
-            m: Connectivity level
-            area: Network area
-            sample_points: Sampling resolution
-            
-        Returns:
-            Probability that network is m-connected
-        """
         # Calculate Q_n,≥m (Equation 25)
         Q_n_m = MConnectivityCalculator.calculate_Q_n_m(l, n, m, area, sample_points)
         
@@ -123,22 +71,6 @@ class MConnectivityCalculator:
     @staticmethod
     def analyze_connectivity_levels(l: float, n: int, area: float,
                                    max_m: int = 3) -> Dict:
-        """
-        Analyze connectivity for multiple m values
-        
-        Simple explanation:
-        - Calculate connectivity for m=1, 2, 3, ...
-        - Shows trade-off: higher m = more robust but lower probability
-        
-        Args:
-            l: Communication distance
-            n: Number of nodes
-            area: Network area
-            max_m: Maximum m to analyze
-            
-        Returns:
-            Dictionary with connectivity analysis for each m
-        """
         results = {}
         
         for m in range(1, max_m + 1):
@@ -160,25 +92,6 @@ class MConnectivityCalculator:
                           target_probability: float = 0.9,
                           n_min: int = 10, n_max: int = 500,
                           tolerance: int = 5) -> Dict:
-        """
-        Find minimum nodes needed for target m-connectivity
-        
-        Simple explanation:
-        - "I want 90% chance of 2-connectivity"
-        - "How many nodes do I need?"
-        - Binary search to find the answer
-        
-        Args:
-            l: Communication distance
-            area: Network area
-            m: Connectivity level
-            target_probability: Target (e.g., 0.9 = 90%)
-            n_min, n_max: Search range
-            tolerance: Convergence tolerance
-            
-        Returns:
-            Dictionary with results
-        """
         # Binary search
         while n_max - n_min > tolerance:
             n_mid = (n_min + n_max) // 2
@@ -209,18 +122,6 @@ class MConnectivityCalculator:
     @staticmethod
     def compare_connectivity_vs_nodes(l: float, area: float, m: int,
                                      n_range: List[int]) -> Dict:
-        """
-        Show how connectivity probability changes with number of nodes
-        
-        Args:
-            l: Communication distance
-            area: Network area
-            m: Connectivity level
-            n_range: List of node counts to test
-            
-        Returns:
-            Dictionary mapping node count to probability
-        """
         results = {}
         
         for n in n_range:
@@ -233,17 +134,6 @@ class MConnectivityCalculator:
     
     @staticmethod
     def connectivity_summary(l: float, n: int, area: float) -> Dict:
-        """
-        Complete connectivity summary for a network configuration
-        
-        Args:
-            l: Communication distance
-            n: Number of nodes
-            area: Network area
-            
-        Returns:
-            Comprehensive connectivity analysis
-        """
         side = np.sqrt(area)
         
         # Calculate for m=1, 2, 3

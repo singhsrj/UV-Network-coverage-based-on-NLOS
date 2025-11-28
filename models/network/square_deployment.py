@@ -22,37 +22,11 @@ from utils.geometry import GeometryUtils
 
 
 class SquareNetworkDeployment:
-    """
-    Deploy UV nodes in square/grid pattern.
-    
-    Simple explanation:
-    - Place nodes in rows and columns
-    - Like planting trees in an orchard - evenly spaced
-    - Spacing depends on how far each node's signal reaches
-    """
-    
     def __init__(self, communication_distance: float):
-        """
-        Initialize square deployment
-        
-        Args:
-            communication_distance: Node communication distance (meters)
-        """
         self.l = communication_distance
         self.calculator = EffectiveCoverageCalculator()
     
     def create_four_node_network(self) -> Dict:
-        """
-        Create 4-node square network (Figure 8)
-        
-        Simple explanation:
-        - 4 nodes at corners of a square
-        - Square side = 3 × communication distance
-        - This is the basic building block
-        
-        Returns:
-            Dictionary with node positions and network info
-        """
         # Network side length = 3l (from paper)
         side_length = 3 * self.l
         
@@ -78,21 +52,6 @@ class SquareNetworkDeployment:
         }
     
     def create_grid_network(self, area_width: float, area_height: float) -> Dict:
-        """
-        Create grid network to cover rectangular area
-        
-        Simple explanation:
-        - Calculate how many nodes needed for width and height
-        - Place them in a grid pattern
-        - Ensures complete coverage
-        
-        Args:
-            area_width: Width of area to cover (meters)
-            area_height: Height of area to cover (meters)
-            
-        Returns:
-            Dictionary with node positions and network info
-        """
         # Calculate effective spacing between nodes
         S_eff = self.calculator.calculate_single_node_effective_coverage(self.l)
         spacing = np.sqrt(S_eff)  # Approximate spacing
@@ -128,36 +87,10 @@ class SquareNetworkDeployment:
         }
     
     def create_square_area_network(self, area: float) -> Dict:
-        """
-        Create network to cover square area
-        
-        Simple explanation:
-        - "I need to cover X square meters"
-        - Automatically calculates how many nodes and where to place them
-        
-        Args:
-            area: Area to cover (square meters)
-            
-        Returns:
-            Dictionary with node positions and network info
-        """
         side_length = np.sqrt(area)
         return self.create_grid_network(side_length, side_length)
     
     def create_minimum_node_network(self, S_ROI: float) -> Dict:
-        """
-        Create network with minimum nodes for area (Equation 29)
-        
-        Simple explanation:
-        - Uses the formula to find minimum nodes needed
-        - Places them efficiently in a grid
-        
-        Args:
-            S_ROI: Region of interest area (square meters)
-            
-        Returns:
-            Dictionary with network configuration
-        """
         # Calculate minimum nodes
         n_min = self.calculator.calculate_minimum_nodes(S_ROI, self.l)
         
@@ -191,36 +124,12 @@ class SquareNetworkDeployment:
     
     def calculate_inter_node_distance(self, pos1: Tuple[float, float], 
                                      pos2: Tuple[float, float]) -> float:
-        """
-        Calculate distance between two nodes
-        
-        Args:
-            pos1: (x, y) position of first node
-            pos2: (x, y) position of second node
-            
-        Returns:
-            Distance in meters
-        """
         return GeometryUtils.euclidean_distance_2d(
             pos1[0], pos1[1], pos2[0], pos2[1]
         )
     
     def get_neighbor_nodes(self, positions: List[Tuple[float, float]], 
                           node_index: int) -> List[int]:
-        """
-        Find neighboring nodes within communication range
-        
-        Simple explanation:
-        - For a given node, which other nodes can it talk to directly?
-        - Neighbors = within communication distance
-        
-        Args:
-            positions: List of all node positions
-            node_index: Index of the node to check
-            
-        Returns:
-            List of indices of neighboring nodes
-        """
         node_pos = positions[node_index]
         neighbors = []
         
@@ -233,20 +142,6 @@ class SquareNetworkDeployment:
         return neighbors
     
     def analyze_network_connectivity(self, positions: List[Tuple[float, float]]) -> Dict:
-        """
-        Analyze connectivity of deployed network
-        
-        Simple explanation:
-        - Check how well nodes are connected
-        - Count neighbors for each node
-        - Identify isolated nodes
-        
-        Args:
-            positions: List of node positions
-            
-        Returns:
-            Connectivity analysis
-        """
         num_nodes = len(positions)
         neighbor_counts = []
         
@@ -264,15 +159,6 @@ class SquareNetworkDeployment:
         }
     
     def get_deployment_summary(self, network: Dict) -> str:
-        """
-        Get human-readable deployment summary
-        
-        Args:
-            network: Network dictionary from deployment function
-            
-        Returns:
-            Formatted summary string
-        """
         summary = []
         summary.append(f"Network Type: {network['network_type']}")
         summary.append(f"Number of Nodes: {network['num_nodes']}")

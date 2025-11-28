@@ -21,36 +21,11 @@ from utils.geometry import GeometryUtils
 
 
 class EffectiveCoverageCalculator:
-    """
-    Calculate effective coverage for UV networks.
-    Handles overlapping coverage from multiple nodes.
-    
-    Simple explanation:
-    - Multiple devices = overlapping circles
-    - Effective coverage = union of all circles (total area covered)
-    - Don't count overlapping parts multiple times
-    """
-    
     # Coverage efficiency from Equation 28
     ETA_EFF = 0.5545  # 55.45% - maximum effective coverage ratio
     
     @staticmethod
     def calculate_overlap_area_two_circles(r1: float, r2: float, d: float) -> float:
-        """
-        Calculate overlap area between two circles
-        
-        Simple explanation:
-        - Two circles overlap like a Venn diagram
-        - Calculate the lens-shaped area in the middle
-        
-        Args:
-            r1: Radius of first circle
-            r2: Radius of second circle  
-            d: Distance between circle centers
-            
-        Returns:
-            Overlap area (square meters)
-        """
         # No overlap if circles too far apart
         if d >= r1 + r2:
             return 0.0
@@ -73,58 +48,18 @@ class EffectiveCoverageCalculator:
     
     @staticmethod
     def calculate_S1(l: float) -> float:
-        """
-        Calculate S1 area (corner region in 4-node network) - Equation 14
-        
-        Simple explanation:
-        - S1 is the uncovered corner area in a square network
-        - Square area minus circular coverage at corner
-        
-        Args:
-            l: Communication distance (meters)
-            
-        Returns:
-            S1 area (square meters)
-        """
         # Equation 14: S1 = l² - (1/4)πl²
         S1 = l**2 - 0.25 * np.pi * l**2
         return S1
     
     @staticmethod
     def calculate_S2(l: float) -> float:
-        """
-        Calculate S2 area (edge overlap region) - Equation 12
-        
-        Simple explanation:
-        - S2 is a small overlap region between adjacent nodes
-        - Shaped like a lens (intersection of two circles)
-        
-        Args:
-            l: Communication distance (meters)
-            
-        Returns:
-            S2 area (square meters)
-        """
         # Equation 12: S2 = (1 - π/6 - √3/4) × l²
         S2 = (1 - np.pi/6 - np.sqrt(3)/4) * l**2
         return S2
     
     @staticmethod
     def calculate_four_node_effective_coverage(l: float) -> float:
-        """
-        Calculate effective coverage for 4-node square network (Equation 15)
-        
-        Simple explanation:
-        - 4 nodes arranged in a square (like corners of a square)
-        - Side length = 3l (from Figure 8)
-        - Total coverage = square area - uncovered corners - overlaps
-        
-        Args:
-            l: Communication distance (meters)
-            
-        Returns:
-            Effective coverage area S_4-eff (square meters)
-        """
         # Equation 10 & 15: S_4-eff = S_EFGH - 4S1 - 4S2
         
         # Square area with side length 3l (Equation 11)
@@ -143,20 +78,6 @@ class EffectiveCoverageCalculator:
     
     @staticmethod
     def calculate_single_node_effective_coverage(l: float) -> float:
-        """
-        Calculate effective coverage added by single node (Equation 17)
-        
-        Simple explanation:
-        - When you add one more node to a network
-        - How much NEW area does it cover?
-        - (Not counting areas already covered by other nodes)
-        
-        Args:
-            l: Communication distance (meters)
-            
-        Returns:
-            Single node effective coverage S_eff (square meters)
-        """
         # Equation 16: Sector area S_PQCB = (1/2)πl²
         S_PQCB = 0.5 * np.pi * l**2
         
@@ -170,36 +91,11 @@ class EffectiveCoverageCalculator:
     
     @staticmethod
     def calculate_coverage_efficiency() -> float:
-        """
-        Calculate coverage efficiency η_eff (Equation 28)
-        
-        Simple explanation:
-        - What fraction of a node's coverage is "useful"?
-        - 55.45% is useful, rest is overlap with neighbors
-        
-        Returns:
-            η_eff = 0.5545 (55.45%)
-        """
         # Equation 28: η_eff = S_eff / S_node = 55.45%
         return EffectiveCoverageCalculator.ETA_EFF
     
     @staticmethod
     def calculate_minimum_nodes(S_ROI: float, l: float) -> int:
-        """
-        Calculate minimum nodes for complete coverage (Equation 29)
-        
-        Simple explanation:
-        - "I need to cover this big area"
-        - "Each node covers this much useful area"
-        - "How many nodes minimum?"
-        
-        Args:
-            S_ROI: Region of interest area (square meters)
-            l: Communication distance per node (meters)
-            
-        Returns:
-            Minimum number of nodes needed
-        """
         # Single node coverage (circular)
         S_node = np.pi * l**2
         
@@ -214,16 +110,6 @@ class EffectiveCoverageCalculator:
     
     @staticmethod
     def get_coverage_summary(l: float, S_ROI: float = 1e6) -> Dict:
-        """
-        Get complete coverage summary
-        
-        Args:
-            l: Communication distance (meters)
-            S_ROI: Region of interest area (default: 1e6 m² = 1 km²)
-            
-        Returns:
-            Dictionary with all coverage metrics
-        """
         # Basic calculations
         S_node = np.pi * l**2
         S1 = EffectiveCoverageCalculator.calculate_S1(l)

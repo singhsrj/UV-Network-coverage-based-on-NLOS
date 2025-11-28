@@ -22,15 +22,6 @@ from models.connectivity.m_connectivity import MConnectivityCalculator
 
 
 class PowerOptimizer:
-    """
-    Optimize transmission power for UV networks.
-    
-    Based on paper's analysis:
-    - Power range: 0.1-0.5W (safety limit from experiments)
-    - Figure 11-12: Coverage vs power for 4-node and single-node
-    - Figure 18: Connectivity vs power for different m-connectivity
-    """
-    
     def __init__(self):
         self.calc = CommunicationDistanceCalculator()
         
@@ -40,22 +31,6 @@ class PowerOptimizer:
     
     def find_minimum_power_for_distance(self, target_distance: float,
                                        Rd: float, theta1: float, theta2: float) -> Dict:
-        """
-        Find minimum power to achieve target distance
-        
-        Simple explanation:
-        - "I need to reach X meters"
-        - "What's the minimum power?"
-        - Binary search to find answer
-        
-        Args:
-            target_distance: Desired communication distance (m)
-            Rd: Data rate (bps)
-            theta1, theta2: Elevation angles (degrees)
-            
-        Returns:
-            Dictionary with optimal power and achieved distance
-        """
         # Binary search
         Pt_low = self.PT_MIN
         Pt_high = self.PT_MAX
@@ -95,22 +70,6 @@ class PowerOptimizer:
     
     def find_minimum_power_for_coverage(self, S_ROI: float, max_nodes: int,
                                        Rd: float, theta1: float, theta2: float) -> Dict:
-        """
-        Find minimum power to cover area with limited nodes
-        
-        Simple explanation:
-        - "I can only afford N devices"
-        - "What power do they need to cover the area?"
-        
-        Args:
-            S_ROI: Area to cover (m²)
-            max_nodes: Maximum nodes available
-            Rd: Data rate (bps)
-            theta1, theta2: Elevation angles (degrees)
-            
-        Returns:
-            Optimal power configuration
-        """
         # Calculate required distance per node
         # From n_min = S_ROI / (η_eff × πl²)
         # Solve for l: l = sqrt(S_ROI / (n_min × η_eff × π))
@@ -137,25 +96,6 @@ class PowerOptimizer:
     def find_minimum_power_for_connectivity(self, S_ROI: float, n: int, m: int,
                                            target_prob: float, Rd: float,
                                            theta1: float, theta2: float) -> Dict:
-        """
-        Find minimum power for target m-connectivity
-        
-        Simple explanation:
-        - "I want 90% chance of 2-connectivity"
-        - "What power do I need?"
-        
-        Based on Figure 18 from paper
-        
-        Args:
-            S_ROI: Coverage area (m²)
-            n: Number of nodes
-            m: Connectivity level
-            target_prob: Target connectivity probability
-            Rd, theta1, theta2: Communication parameters
-            
-        Returns:
-            Optimal power for connectivity
-        """
         # Binary search on power
         Pt_low = self.PT_MIN
         Pt_high = self.PT_MAX
@@ -193,18 +133,6 @@ class PowerOptimizer:
     
     def analyze_power_impact(self, Pt_range: np.ndarray, Rd: float,
                             theta1: float, theta2: float, S_ROI: float) -> Dict:
-        """
-        Analyze impact of power on network metrics
-        Reproduces Figures 11-12 and 18 analysis from paper
-        
-        Args:
-            Pt_range: Range of powers to test (W)
-            Rd, theta1, theta2: Fixed communication parameters
-            S_ROI: Coverage area (m²)
-            
-        Returns:
-            Complete power analysis
-        """
         results = {
             'Pt_values': Pt_range,
             'distances': [],

@@ -23,12 +23,6 @@ from models.connectivity.network_robustness import NetworkRobustnessAnalyzer
 
 
 class NetworkDesignOptimizer:
-    """
-    Complete network design optimizer.
-    Integrates all optimization strategies for comprehensive network design.
-    
-    Based on paper's complete analysis across all sections.
-    """
     
     def __init__(self):
         self.sweep = None  # Will initialize with specific S_ROI
@@ -37,28 +31,6 @@ class NetworkDesignOptimizer:
         self.rate_opt = RateOptimizer()
     
     def design_network(self, requirements: Dict) -> Dict:
-        """
-        Design complete network based on requirements
-        
-        Simple explanation:
-        - You tell it what you need
-        - It finds the best configuration
-        - Returns complete design with all parameters
-        
-        Requirements:
-        - 'S_ROI': Area to cover (m²) - REQUIRED
-        - 'budget_nodes': Maximum nodes available (optional)
-        - 'target_connectivity': Target connectivity probability (default: 0.9)
-        - 'connectivity_level': m-connectivity level (default: 2)
-        - 'min_distance': Minimum distance required (optional)
-        - 'priority': 'cost', 'reliability', or 'balanced' (default: 'balanced')
-        
-        Args:
-            requirements: Dictionary with network requirements
-            
-        Returns:
-            Complete network design
-        """
         # Extract requirements
         S_ROI = requirements['S_ROI']
         budget_nodes = requirements.get('budget_nodes', None)
@@ -136,20 +108,6 @@ class NetworkDesignOptimizer:
         }
     
     def optimize_for_cost(self, S_ROI: float, target_connectivity: float = 0.9) -> Dict:
-        """
-        Optimize network design to minimize cost (nodes)
-        
-        Simple explanation:
-        - Find cheapest way to cover area
-        - While still meeting connectivity target
-        
-        Args:
-            S_ROI: Area to cover
-            target_connectivity: Minimum connectivity requirement
-            
-        Returns:
-            Cost-optimized design
-        """
         requirements = {
             'S_ROI': S_ROI,
             'target_connectivity': target_connectivity,
@@ -158,20 +116,6 @@ class NetworkDesignOptimizer:
         return self.design_network(requirements)
     
     def optimize_for_reliability(self, S_ROI: float, budget_nodes: int) -> Dict:
-        """
-        Optimize network design to maximize reliability
-        
-        Simple explanation:
-        - Given a budget, make network as reliable as possible
-        - Maximize connectivity probability
-        
-        Args:
-            S_ROI: Area to cover
-            budget_nodes: Available nodes
-            
-        Returns:
-            Reliability-optimized design
-        """
         requirements = {
             'S_ROI': S_ROI,
             'budget_nodes': budget_nodes,
@@ -180,19 +124,6 @@ class NetworkDesignOptimizer:
         return self.design_network(requirements)
     
     def compare_designs(self, designs: list) -> Dict:
-        """
-        Compare multiple network designs
-        
-        Simple explanation:
-        - Test several configurations
-        - Show which is best for different criteria
-        
-        Args:
-            designs: List of design dictionaries
-            
-        Returns:
-            Comparison results
-        """
         results = []
         
         for i, design_req in enumerate(designs):

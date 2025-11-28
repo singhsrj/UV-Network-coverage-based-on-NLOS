@@ -17,35 +17,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 
 class ProbabilityDensityFunction:
-    """
-    Probability density functions for node distribution.
-    
-    Simple explanation:
-    - Uniform distribution: nodes equally likely anywhere in area
-    - Like throwing darts at a board - equal chance everywhere
-    - Used for calculating connectivity probabilities
-    """
-    
     @staticmethod
     def uniform_square(x: float, y: float, n: int, area: float) -> float:
-        """
-        Uniform probability density for square network (Equation 18)
-        
-        Simple explanation:
-        - n nodes spread evenly over an area
-        - Probability = n / area (constant everywhere)
-        - Like: "10 people in 100 m² room = 0.1 people per m²"
-        
-        Equation 18: U(tx, φx) = n / S_ROI for (tx, φx) ∈ C
-        
-        Args:
-            x, y: Point coordinates (meters)
-            n: Total number of nodes in network
-            area: Total area (S_ROI in square meters)
-            
-        Returns:
-            Probability density (nodes per square meter)
-        """
         if area <= 0:
             return 0.0
         
@@ -55,56 +28,16 @@ class ProbabilityDensityFunction:
     
     @staticmethod
     def uniform_square_polar(t: float, phi: float, n: int, area: float) -> float:
-        """
-        Uniform probability density in polar coordinates
-        
-        Simple explanation:
-        - Same as uniform_square but uses polar coordinates (r, θ)
-        - Useful for calculating connectivity integrals (Equations 20-25)
-        
-        Args:
-            t: Radial coordinate (meters from origin)
-            phi: Angular coordinate (radians)
-            n: Number of nodes
-            area: Total area (square meters)
-            
-        Returns:
-            Probability density
-        """
         return ProbabilityDensityFunction.uniform_square(
             t * np.cos(phi), t * np.sin(phi), n, area
         )
     
     @staticmethod
     def is_point_in_square(x: float, y: float, side_length: float) -> bool:
-        """
-        Check if point is inside square region
-        
-        Args:
-            x, y: Point coordinates
-            side_length: Side length of square
-            
-        Returns:
-            True if point is inside square
-        """
         return (0 <= x <= side_length) and (0 <= y <= side_length)
     
     @staticmethod
     def create_uniform_pdf(n: int, area: float) -> Callable:
-        """
-        Create a probability density function for uniform distribution
-        
-        Simple explanation:
-        - Returns a function that you can call with (x, y)
-        - Always returns same value (uniform = constant)
-        
-        Args:
-            n: Number of nodes
-            area: Coverage area
-            
-        Returns:
-            Function that takes (x, y) and returns probability density
-        """
         def pdf(x: float, y: float) -> float:
             return ProbabilityDensityFunction.uniform_square(x, y, n, area)
         
@@ -113,22 +46,6 @@ class ProbabilityDensityFunction:
     @staticmethod
     def calculate_expected_neighbors(n: int, area: float, 
                                     communication_distance: float) -> float:
-        """
-        Calculate expected number of neighbors for a node
-        
-        Simple explanation:
-        - On average, how many other nodes are within range?
-        - Uses: density × coverage area
-        - Like: "0.1 people/m² × 100 m² coverage = 10 neighbors"
-        
-        Args:
-            n: Total nodes in network
-            area: Total network area
-            communication_distance: How far each node can reach
-            
-        Returns:
-            Expected number of neighbors
-        """
         # Density of other nodes (excluding self)
         density = (n - 1) / area
         
@@ -143,22 +60,6 @@ class ProbabilityDensityFunction:
     @staticmethod
     def calculate_isolation_probability(n: int, area: float,
                                        communication_distance: float) -> float:
-        """
-        Calculate probability that a node has NO neighbors (isolated)
-        
-        Simple explanation:
-        - What's the chance a node is alone (can't talk to anyone)?
-        - Uses Poisson distribution approximation
-        - Important for network reliability
-        
-        Args:
-            n: Number of nodes
-            area: Network area
-            communication_distance: Communication range
-            
-        Returns:
-            Probability of isolation (0 to 1)
-        """
         # Expected neighbors
         lambda_val = ProbabilityDensityFunction.calculate_expected_neighbors(
             n, area, communication_distance
@@ -171,16 +72,6 @@ class ProbabilityDensityFunction:
     
     @staticmethod
     def calculate_network_density(n: int, area: float) -> dict:
-        """
-        Calculate various network density metrics
-        
-        Args:
-            n: Number of nodes
-            area: Network area
-            
-        Returns:
-            Dictionary with density metrics
-        """
         side_length = np.sqrt(area)
         density = n / area
         
@@ -195,38 +86,14 @@ class ProbabilityDensityFunction:
 
 
 class NodeDistribution:
-    """
-    Node distribution models for different deployment scenarios
-    """
-    
     @staticmethod
     def uniform_random(n: int, area: float) -> np.ndarray:
-        """
-        Generate uniform random node positions
-        
-        Args:
-            n: Number of nodes
-            area: Square area
-            
-        Returns:
-            Array of (x, y) positions
-        """
         side = np.sqrt(area)
         positions = np.random.uniform(0, side, (n, 2))
         return positions
     
     @staticmethod
     def grid_deterministic(n: int, area: float) -> np.ndarray:
-        """
-        Generate deterministic grid positions
-        
-        Args:
-            n: Number of nodes
-            area: Square area
-            
-        Returns:
-            Array of (x, y) positions
-        """
         side = np.sqrt(area)
         grid_size = int(np.ceil(np.sqrt(n)))
         spacing = side / grid_size

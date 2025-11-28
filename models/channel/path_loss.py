@@ -9,24 +9,9 @@ import numpy as np
 from typing import Tuple, Dict
 
 class PathLossModel:
-    """
-    Path loss model for UV NLOS channel
-    Based on scattering parameters from literature.
-    """
     
     @staticmethod
     def calculate_loss_exponent(theta1: float, theta2: float) -> float:
-        """
-        Calculate loss exponent α for given elevation angles.
-        Calibrated to match experimental results (~300-500m range).
-        
-        Args:
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            
-        Returns:
-            Loss exponent α (dimensionless)
-        """
         # Convert to radians
         theta1_rad = np.radians(theta1)
         theta2_rad = np.radians(theta2)
@@ -52,18 +37,6 @@ class PathLossModel:
     def calculate_loss_factor(theta1: float, theta2: float, 
                              wavelength: float = 265e-9,
                              scattering_coefficient: float = 1.0) -> float:
-        """
-        Calculate loss factor ξ for given elevation angles.
-        
-        Args:
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            wavelength: UV wavelength (m)
-            scattering_coefficient: Atmospheric scattering coefficient
-            
-        Returns:
-            Loss factor ξ (dimensionless)
-        """
         # Convert to radians
         theta1_rad = np.radians(theta1)
         theta2_rad = np.radians(theta2)
@@ -88,16 +61,6 @@ class PathLossModel:
     
     @staticmethod
     def get_path_loss_parameters(theta1: float, theta2: float) -> Dict[str, float]:
-        """
-        Get both path loss parameters for elevation combination
-        
-        Args:
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            
-        Returns:
-            Dictionary with 'alpha' and 'xi' parameters
-        """
         alpha = PathLossModel.calculate_loss_exponent(theta1, theta2)
         xi = PathLossModel.calculate_loss_factor(theta1, theta2)
         
@@ -110,15 +73,6 @@ class PathLossModel:
     
     @staticmethod
     def compare_elevation_combinations(combinations: list) -> Dict:
-        """
-        Compare path loss parameters for multiple elevation combinations
-        
-        Args:
-            combinations: List of (theta1, theta2) tuples
-            
-        Returns:
-            Dictionary mapping combinations to parameters
-        """
         results = {}
         
         for theta1, theta2 in combinations:
@@ -136,16 +90,6 @@ class ScatteringModel:
     
     @staticmethod
     def calculate_scattering_angle(theta1: float, theta2: float) -> float:
-        """
-        Calculate scattering angle at effective scatterer
-        
-        Args:
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            
-        Returns:
-            Scattering angle (degrees)
-        """
         # For NLOS communication, scattering angle relates to elevation angles
         theta_scatter = 180 - (theta1 + theta2)
         return theta_scatter
@@ -154,18 +98,6 @@ class ScatteringModel:
     def calculate_effective_scatterer_volume(theta1: float, theta2: float,
                                             beam_divergence: float,
                                             distance: float) -> float:
-        """
-        Calculate effective scattering volume
-        
-        Args:
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            beam_divergence: Beam divergence angle (degrees)
-            distance: Communication distance (m)
-            
-        Returns:
-            Effective scattering volume (m³)
-        """
         # Convert to radians
         theta1_rad = np.radians(theta1)
         theta2_rad = np.radians(theta2)
@@ -189,18 +121,6 @@ class ScatteringModel:
     @staticmethod
     def get_scattering_summary(theta1: float, theta2: float, 
                               beam_divergence: float, distance: float) -> Dict:
-        """
-        Get complete scattering characteristics
-        
-        Args:
-            theta1: Transmission elevation angle (degrees)
-            theta2: Reception elevation angle (degrees)
-            beam_divergence: Beam divergence angle (degrees)
-            distance: Communication distance (m)
-            
-        Returns:
-            Dictionary with scattering parameters
-        """
         scattering_angle = ScatteringModel.calculate_scattering_angle(theta1, theta2)
         volume = ScatteringModel.calculate_effective_scatterer_volume(
             theta1, theta2, beam_divergence, distance
